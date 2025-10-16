@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 import { API_BASE_URL } from "../utils/api";
 
-const VideoPlayer = ({ playlistUrl = "/stream/output.m3u8" }) => {
+const VideoPlayer = ({ playlistUrl = "public/stream/output.m3u8" }) => {
   const videoRef = useRef(null);
   const [overlays, setOverlays] = useState([]);
 
@@ -40,91 +40,91 @@ const VideoPlayer = ({ playlistUrl = "/stream/output.m3u8" }) => {
   }, []);
 
   return (
-    // <div style={{ position: "relative", width: "100%", maxWidth: "800px" }}>
-    //   {/* Video */}
-    //   <video
-    //     ref={videoRef}
-    //     width="100%"
-    //     height="auto"
-    //     controls
-    //     style={{ display: "block" }}
-    //   />
-
-    //   {/* Overlays */}
-    //   {overlays.map((o) =>
-    //     o.type === "image" ? (
-    //       <img
-    //         key={o._id}
-    //         src={o.content}
-    //         alt="overlay"
-    //         style={{
-    //           position: "absolute",
-    //           left: o.position?.x || 0,
-    //           top: o.position?.y || 0,
-    //           width: o.size?.width || "auto",
-    //           height: o.size?.height || "auto",
-    //           pointerEvents: "none",
-    //         }}
-    //       />
-    //     ) : (
-    //       <div
-    //         key={o._id}
-    //         style={{
-    //           position: "absolute",
-    //           left: o.position?.x || 0,
-    //           top: o.position?.y || 0,
-    //           fontSize: o.size?.height || 20,
-    //           color: "white",
-    //           fontWeight: "bold",
-    //           pointerEvents: "none",
-    //         }}
-    //       >
-    //         {o.content}
-    //       </div>
-    //     )
-    //   )}
-    // </div>
-
-    <div className="video-container">
+    <div style={{ position: "relative", width: "100%", maxWidth: "800px" }}>
+      {/* Video */}
       <video
         ref={videoRef}
         width="100%"
         height="auto"
         controls
-        className="video-player"
+        style={{ display: "block" }}
       />
 
-      <div className="overlays-container">
-        {overlays.map((o) =>
-          o.type === "image" ? (
-            <img
-              key={o._id}
-              src={o.content}
-              alt="overlay"
-              className="overlay-image"
-              style={{
-                left: o.position?.x || 0,
-                top: o.position?.y || 0,
-                width: o.size?.width || "auto",
-                height: o.size?.height || "auto",
-              }}
-            />
-          ) : (
-            <div
-              key={o._id}
-              className="overlay-text"
-              style={{
-                left: o.position?.x || 0,
-                top: o.position?.y || 0,
-                fontSize: o.size?.height || 20,
-              }}
-            >
-              {o.content}
-            </div>
-          )
-        )}
-      </div>
+      {/* Overlays */}
+      {overlays.map((o) =>
+        o.type === "image" ? (
+          <img
+            key={o._id}
+            src={o.content}
+            alt="overlay"
+            style={{
+              position: "absolute",
+              left: o.position?.x || 0,
+              top: o.position?.y || 0,
+              width: o.size?.width || "auto",
+              height: o.size?.height || "auto",
+              pointerEvents: "none",
+            }}
+          />
+        ) : (
+          <div
+            key={o._id}
+            style={{
+              position: "absolute",
+              left: o.position?.x || 0,
+              top: o.position?.y || 0,
+              fontSize: o.size?.height || 20,
+              color: "white",
+              fontWeight: "bold",
+              pointerEvents: "none",
+            }}
+          >
+            {o.content}
+          </div>
+        )
+      )}
     </div>
+
+    // <div className="video-container">
+    //   <video
+    //     ref={videoRef}
+    //     width="100%"
+    //     height="auto"
+    //     controls
+    //     className="video-player"
+    //   />
+
+    //   <div className="overlays-container">
+    //     {overlays.map((o) =>
+    //       o.type === "image" ? (
+    //         <img
+    //           key={o._id}
+    //           src={o.content}
+    //           alt="overlay"
+    //           className="overlay-image"
+    //           style={{
+    //             left: o.position?.x || 0,
+    //             top: o.position?.y || 0,
+    //             width: o.size?.width || "auto",
+    //             height: o.size?.height || "auto",
+    //           }}
+    //         />
+    //       ) : (
+    //         <div
+    //           key={o._id}
+    //           className="overlay-text"
+    //           style={{
+    //             left: o.position?.x || 0,
+    //             top: o.position?.y || 0,
+    //             fontSize: o.size?.height || 20,
+    //           }}
+    //         >
+    //           {o.content}
+    //         </div>
+    //       )
+    //     )}
+    //   </div>
+    // </div>
   );
 };
 

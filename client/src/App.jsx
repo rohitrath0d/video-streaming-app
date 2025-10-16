@@ -53,7 +53,8 @@ function App() {
             <VideoPlayer playlistUrl={playlistUrl} />
           ) : (
             <div className="placeholder-box">
-              <h2>No active stream</h2>
+              <h2>No active stream. Please enter a RTSP URL below to start a stream.</h2>
+              
             </div>
           )}
         </div>
