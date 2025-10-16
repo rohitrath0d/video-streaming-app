@@ -86,7 +86,7 @@ const VideoPlayer = ({ playlistUrl = "public/stream/output.m3u8" }) => {
   useEffect(() => {
     const fetchOverlays = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/overlays`);
+        const res = await fetch(`${API_BASE_URL}/overlays/`);
         const data = await res.json();
         if (data.success) setOverlays(data.overlays);
       } catch (err) {
@@ -140,7 +140,7 @@ const VideoPlayer = ({ playlistUrl = "public/stream/output.m3u8" }) => {
     };
 
     try {
-      const res = await fetch(`${API_BASE_URL}/overlays`, {
+      const res = await fetch(`${API_BASE_URL}/overlays/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(overlay),
@@ -166,44 +166,167 @@ const VideoPlayer = ({ playlistUrl = "public/stream/output.m3u8" }) => {
     setNewImageUrl("");
   };
 
+  const handleDelete = async (id) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/overlays/${id}`, {
+        method: 'DELETE'
+      });
+      const data = await res.json();
+      if (data.success) {
+        setOverlays(prev => prev.filter(o => o._id !== id));
+      }
+    } catch (err) {
+      console.error("Failed to delete overlay:", err);
+    }
+  };
+
+  const handleSizeChange = async (id, width, height) => {
+    try {
+      const overlay = overlays.find(o => o._id === id);
+      if (!overlay) return;
+
+      const updatedSize = { width: Number(width), height: Number(height) };
+
+      await fetch(`${API_BASE_URL}/overlays/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ size: updatedSize })
+      });
+
+      setOverlays(prev => prev.map(o =>
+        o._id === id ? { ...o, size: updatedSize } : o
+      ));
+    } catch (err) {
+      console.error("Failed to update overlay size:", err);
+    }
+  };
   return (
     <DndProvider backend={HTML5Backend}>
-      <div style={{ position: "relative", width: "100%", maxWidth: "800px" }}>
-        <video
-          ref={videoRef}
-          width="100%"
-          height="auto"
-          controls
-          style={{ display: "block" }}
-        />
+      <div className="flex w-full h-[60vh] p-4 gap-4">
+        {/* LEFT: Video Section */}
+        <div className="relative flex-[3] bg-black rounded-lg shadow-lg overflow-hidden">
+          <video
+            ref={videoRef}
+            className="w-full h-full object-contain"
+            controls
+          />
 
-        <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}>
-          {overlays.map((overlay) => (
-            <DraggableOverlay key={overlay._id} overlay={overlay} onMove={handleMove} />
-          ))}
+          {/* Overlays Container */}
+          <div className="absolute inset-0 pointer-events-none">
+            {overlays.map((overlay) => (
+              <DraggableOverlay
+                key={overlay._id}
+                overlay={overlay}
+                onMove={handleMove}
+              />
+            ))}
+          </div>
         </div>
 
-        {/* Add overlay UI */}
-        <div style={{ position: "absolute", top: 10, left: 10, zIndex: 1000, background: "rgba(0,0,0,0.5)", padding: "8px", borderRadius: "8px" }}>
-          <div style={{ marginBottom: "5px" }}>
-            <input
-              type="text"
-              placeholder="Text overlay"
-              value={newText}
-              onChange={(e) => setNewText(e.target.value)}
-              style={{ marginRight: 5 }}
-            />
-            <button onClick={handleAddText}>Add Text</button>
+        {/* RIGHT: Overlay Controls Panel */}
+        <div className="flex-[2] bg-white rounded-lg p-4 text-black overflow-y-auto shadow-lg h-full">
+          {/* Add New Overlay Section */}
+          <div className="mb-6">
+            <h4 className="text-lg font-semibold mb-4">Add New Overlay</h4>
+
+            <div className="space-y-4">
+              {/* Text Overlay */}
+              <div className="space-y-2">
+                <label className="text-sm text-gray-500">Text Overlay</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Enter text..."
+                    value={newText}
+                    onChange={(e) => setNewText(e.target.value)}
+                    className="flex-1 px-3 py-2 rounded bg-gray-100 border border-gray-300 focus:outline-none focus:border-blue-500"
+                  />
+                  <button
+                    onClick={handleAddText}
+                    className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+
+              {/* Image Overlay */}
+              <div className="space-y-2">
+                <label className="text-sm text-gray-500">Image Overlay</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Image URL..."
+                    value={newImageUrl}
+                    onChange={(e) => setNewImageUrl(e.target.value)}
+                    className="flex-1 px-3 py-2 rounded bg-gray-100 border border-gray-300 focus:outline-none focus:border-blue-500"
+                  />
+                  <button
+                    onClick={handleAddImage}
+                    className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
-          <div>
-            <input
-              type="text"
-              placeholder="Image URL"
-              value={newImageUrl}
-              onChange={(e) => setNewImageUrl(e.target.value)}
-              style={{ marginRight: 5 }}
-            />
-            <button onClick={handleAddImage}>Add Image</button>
+
+          {/* Existing Overlays */}
+          <div className="border-t border-gray-300 pt-4">
+            <h4 className="text-lg font-semibold mb-4">Existing Overlays</h4>
+            <div className="space-y-3">
+              {overlays.map((overlay) => (
+                <div
+                  key={overlay._id}
+                  className="bg-gray-100 p-3 rounded-lg flex flex-col gap-2"
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-700 truncate w-[80%]">
+                      {overlay.type}: {overlay.content.substring(0, 20)}...
+                    </span>
+                    <button
+                      onClick={() => handleDelete(overlay._id)}
+                      className="px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700 transition-colors text-sm"
+                    >
+                      Delete
+                    </button>
+                  </div>
+
+                  {overlay.type === "image" && (
+                    <div className="flex gap-2 items-center">
+                      <input
+                        type="number"
+                        value={overlay.size?.width || 50}
+                        onChange={(e) =>
+                          handleSizeChange(
+                            overlay._id,
+                            e.target.value,
+                            overlay.size?.height
+                          )
+                        }
+                        placeholder="Width"
+                        className="w-20 px-2 py-1 rounded bg-white border border-gray-300 text-sm"
+                      />
+                      <span className="text-gray-500">×</span>
+                      <input
+                        type="number"
+                        value={overlay.size?.height || 50}
+                        onChange={(e) =>
+                          handleSizeChange(
+                            overlay._id,
+                            overlay.size?.width,
+                            e.target.value
+                          )
+                        }
+                        placeholder="Height"
+                        className="w-20 px-2 py-1 rounded bg-white border border-gray-300 text-sm"
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
