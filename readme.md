@@ -184,6 +184,13 @@ The application will be available at `http://localhost:5173`
 - Check console for error messages
 - Verify RTSP URL is accessible (or use a free RTSP testing service: https://www.rtsp.stream/admin/teststream)
 
+### Documentation and references:
+- [React dnd docs](https://react-dnd.github.io/react-dnd/about)
+- [RTSP test stream links](https://www.rtsp.stream/admin/teststream)
+- [Flask app with mongo medium blog](https://ankush-chavan.medium.com/creating-flask-application-with-mongodb-database-77ec45b5b995)
+- [Flask official documentation](https://flask.palletsprojects.com/en/stable/quickstart/#unique-urls-redirection-behavior)
+- [Youtube video reference on RTSP protocol reference](https://www.youtube.com/watch?v=0_kjYR2rM7o)
+
 ## License
 
 Copyright © 2025. All Rights Reserved.
