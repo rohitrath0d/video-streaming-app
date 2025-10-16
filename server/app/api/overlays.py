@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from db.mongoConnect import overlays_collection
-from bson import ObjectId
+from bson.objectid import ObjectId
 
 overlays_bp = Blueprint('overlays', __name__)
 
@@ -8,7 +8,8 @@ overlays_bp = Blueprint('overlays', __name__)
 @overlays_bp.route('/', methods=['POST'])
 def create_overlay():
   try:
-    data = request.get_json()
+    # data = request.get_json()
+    data = request.json
     overlay = {
         "content": data.get("content"),
         "position": data.get("position", {"x": 0, "y": 0}),
@@ -35,7 +36,8 @@ def get_overlays():
     try:
         overlays = []
         for o in overlays_collection.find():
-            o['_id'] = str(o["id"])
+            o["_id"] = str(o["_id"])    # convert ObjectId to string for JSON
+            overlays.append(o)
         return jsonify({
             "success": True,
             "overlays": overlays
@@ -51,21 +53,30 @@ def get_overlays():
 @overlays_bp.route('/<overlay_id>', methods=['PUT'])
 def update_overlay(overlay_id):
   try:
-    data = request.get_json()
+    data = request.json
     update_data = {
         "content": data.get("content"),
         "position": data.get("position"),
         "size": data.get("size"),
     }
+    
+    # Remove keys with None
+    update_data = {k: v for k, v in update_data.items() if v is not None}
+    
     result = overlays_collection.update_one(
         {"_id": ObjectId(overlay_id)},
-        {"$set": {k: v for k, v in update_data.items() if v is not None}}
+        {"$set": update_data}
     )
     if result.matched_count == 0:
         return jsonify({
             "success": False,
             "message": "Overlay not found"
         }), 404
+    
+    return jsonify({
+            "success": True,
+            "message": "Overlay updated"
+        }), 200
 
   except Exception as e:
         return jsonify({
@@ -74,7 +85,7 @@ def update_overlay(overlay_id):
         }), 500
 
 
-overlays_bp.route("/<overlay_id>", methods=["DELETE"])
+@overlays_bp.route("/<overlay_id>", methods=["DELETE"])
 def delete_overlay(overlay_id):
     try:
         result = overlays_collection.delete_one({"_id": ObjectId(overlay_id)})

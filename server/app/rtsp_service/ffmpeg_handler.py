@@ -10,7 +10,7 @@ def start_ffmpeg_stream(rtsp_url: str):
   global ffmpeg_process
   
   # validating url
-  if not rtsp_url.startsWith("rtsp://"):
+  if not rtsp_url.startswith("rtsp://"):
     return {
       "success": False,
       "error": "Invalid RTSP URL!"
@@ -26,8 +26,10 @@ def start_ffmpeg_stream(rtsp_url: str):
   
   # construct ffmpeg command using the rtsp_url
   output_file= output_folder / "output.m3u8"
+  ffmpeg_path = Path(__file__).parent.parent.parent / "ffmpeg" / "bin" / "ffmpeg.exe"
   command = [
-    "ffmpeg",
+    # "ffmpeg",
+    str(ffmpeg_path),
     "-rtsp_transport", "tcp",
     "-i", rtsp_url,
     "-f", "hls",
