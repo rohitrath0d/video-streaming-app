@@ -29,7 +29,7 @@ function App() {
 
   const handleStop = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/stream/stop`, { method: "POST" });
+      const res = await fetch(`${API_BASE_URL}/stream/stop`, { method: "POST" });
       const data = await res.json();
       if (data.success) {
         setPlaylistUrl(null);
@@ -44,23 +44,47 @@ function App() {
   };
 
   return (
-    <>
-      <div style={{ padding: "20px" }}>
-        <h1>Live Stream</h1>
-        <input
-          type="text"
-          value={rtspUrl}
-          onChange={(e) => setRtspUrl(e.target.value)}
-          placeholder="Enter RTSP URL"
-          style={{ width: "400px", marginRight: "10px" }}
-        />
-        <button onClick={handleStart}>Start Stream</button>
-        <button onClick={handleStop} style={{ marginLeft: "10px" }}>Stop Stream</button>
-        <p>{message}</p>
+    <div className="app-container">
+      <div className="content-wrapper">
+        <h3 className="main-title">Live Stream</h3>
 
-        {playlistUrl && <VideoPlayer playlistUrl={playlistUrl} />}
+        <div className="video-section">
+          {playlistUrl ? (
+            <VideoPlayer playlistUrl={playlistUrl} />
+          ) : (
+            <div className="placeholder-box">
+              <h2>No active stream</h2>
+            </div>
+          )}
+        </div>
+
+        <div className="controls-section">
+          <h2 className="subtitle">Enter RTSP URL to start streaming</h2>
+          <div className="input-group">
+            <input
+              type="text"
+              value={rtspUrl}
+              onChange={(e) => setRtspUrl(e.target.value)}
+              placeholder="rtsp://example.com/stream"
+              className="stream-input"
+            />
+            <button
+              onClick={handleStart}
+              className="control-button start"
+            >
+              Start Stream
+            </button>
+            <button
+              onClick={handleStop}
+              className="control-button stop"
+            >
+              Stop Stream
+            </button>
+          </div>
+          {message && <p className="message">{message}</p>}
+        </div>
       </div>
-    </>
+    </div>
   )
 }
 
